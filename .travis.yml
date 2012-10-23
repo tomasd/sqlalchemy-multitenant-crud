@@ -1,0 +1,11 @@
+language: python
+
+python:
+  - 2.7
+
+before_install: pip install sqlalchemy nose
+
+script: python setup.py nosetests
+
+notifications:
+  email: true

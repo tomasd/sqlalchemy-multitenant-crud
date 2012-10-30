@@ -98,14 +98,14 @@ def object_count(session, company, entity_class, **kwargs):
     return _get_query(session, company, entity_class, **kwargs).count()
 
 
-def create_or_update(session, entity_class, **kwargs):
-    entity = read(session, entity_class, **kwargs)
+def create_or_update(session, company, entity_class, **kwargs):
+    entity = read(session, company, entity_class, **kwargs)
 
     if entity:
-        kwargs.pop(id, None)
-        update(session, entity_class, id=entity.id, **kwargs)
+        kwargs.pop('id', None)
+        update(session, company, entity_class, id=entity.id, **kwargs)
     else:
-        entity = create(session, entity_class, **kwargs)
+        entity = create(session, company, entity_class, **kwargs)
     session.flush()
 
     return entity

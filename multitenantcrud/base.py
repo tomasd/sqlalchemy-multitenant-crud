@@ -1,5 +1,5 @@
 import collections
-from sqlalchemy import orm
+from sqlalchemy import orm, and_
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 import functools
 from multitenantcrud.paginate import paginate
@@ -123,7 +123,19 @@ def _get_query(session, company, entity_class, **kwargs):
 
 
     if kwargs:
-        query = query.filter_by(**kwargs)
+        conditions = []
+        for attribute, value in kwargs.iteritems():
+            condition = None
+            if isinstance(value, list):
+                if value:
+                    condition = getattr(entity_class, attribute).in_(value)
+            else:
+                condition = getattr(entity_class, attribute) == value
+
+            if condition is not None:
+                conditions.append(condition)
+
+        query = query.filter(and_(*conditions))
 
     return query.options(*OPTIONS.get(entity_class, []))
 

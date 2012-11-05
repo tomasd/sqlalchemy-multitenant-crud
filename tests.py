@@ -1,9 +1,8 @@
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declarative_base
 import sqlalchemy.orm as orm
-import crud
-
-
+import multitenantcrud as crud
+from nose.tools import eq_
 
 Model = declarative_base()
 Session = orm.sessionmaker()
@@ -24,9 +23,10 @@ class MyModel(Model):
 
 def setUp():
     engine = sa.create_engine('sqlite://')
-    session.bind=engine
+    session.bind = engine
     Model.bing = engine
     Model.metadata.create_all(bind=engine)
+
 
 def test_crud():
     company = Company()
@@ -54,3 +54,14 @@ def test_crud():
     assert delete_obj is None
 
     assert 0 == crud.object_count(session, company, MyModel)
+
+
+def test_multi_param_query():
+    company = Company()
+    session.add(company)
+
+    obj1 = crud.create(session, company, MyModel, name='obj1')
+    obj2 = crud.create(session, company, MyModel, name='obj2')
+
+    eq_({obj1, obj2},
+        set(crud.object_list(session, company, MyModel, name=['obj1', 'obj2'])))

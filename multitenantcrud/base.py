@@ -66,7 +66,7 @@ def update(session, company, entity_class, id, **kwargs):
 
 @flush
 def update_entity(session, company, entity):
-    pass
+    return entity
 
 
 @flush

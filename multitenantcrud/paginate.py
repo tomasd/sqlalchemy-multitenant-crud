@@ -10,7 +10,7 @@ def paginate(query, page, per_page=20):
     """
     items = query.limit(per_page).offset((page - 1) * per_page).all()
 
-    return Pagination(query, page, per_page, query.count(), items)
+    return Pagination(query, page, per_page, query.order_by(None).count(), items)
 
 class Pagination(object):
     """Internal helper class returned by :meth:`BaseQuery.paginate`.  You

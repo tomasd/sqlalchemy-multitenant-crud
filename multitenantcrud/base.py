@@ -27,9 +27,10 @@ def create(session, company, entity_class, **kwargs):
 
 
 def read(session, company, entity_class, id=None, **kwargs):
-    assert id is not None or kwargs
+    if id is None and not kwargs:
+        return None
 
-    query = _get_query(session, company, entity_class)
+    query = _get_query(session, company, entity_class, **kwargs)
     if id is not None:
         if isinstance(id, list):
             entities = query.filter(entity_class.id.in_(id)).all()
@@ -37,11 +38,8 @@ def read(session, company, entity_class, id=None, **kwargs):
             return [a for a in entities if
                     _get_company(a, company) == company]
         else:
-            entity = query.enable_assertions(False).get(id)
-            if _get_company(entity, company) == company:
-                return entity
+            query = query.enable_assertions(False).filter(entity_class.id == id)
 
-    query = query.filter_by(**kwargs)
     try:
         entity = query.enable_assertions(False).one()
 
@@ -56,7 +54,7 @@ def read(session, company, entity_class, id=None, **kwargs):
 
 @flush
 def update(session, company, entity_class, id, **kwargs):
-    entity = read(session, company, entity_class, id=id, **kwargs)
+    entity = read(session, company, entity_class, id=id)
 
     for key, value in kwargs.iteritems():
         setattr(entity, key, value)
@@ -99,10 +97,10 @@ def object_count(session, company, entity_class, **kwargs):
 
 
 def create_or_update(session, company, entity_class, **kwargs):
-    entity = read(session, company, entity_class, **kwargs)
+    id = kwargs.pop('id', None)
+    entity = read(session, company, entity_class, id=id)
 
     if entity:
-        kwargs.pop('id', None)
         update(session, company, entity_class, id=entity.id, **kwargs)
     else:
         entity = create(session, company, entity_class, **kwargs)

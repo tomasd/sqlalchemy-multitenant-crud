@@ -10,6 +10,6 @@ setup(
     author='Tomas Drencak',
     author_email='tomas@drencak.com',
     description='',
-    install_requires=['sqlalchemy'],
+    install_requires=[],
     tests_require=['nose']
 )

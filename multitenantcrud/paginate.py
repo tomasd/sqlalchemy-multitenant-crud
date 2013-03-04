@@ -88,3 +88,6 @@ class Pagination(object):
                     yield None
                 yield num
                 last = num
+
+    def __iter__(self):
+        return iter(self.items)

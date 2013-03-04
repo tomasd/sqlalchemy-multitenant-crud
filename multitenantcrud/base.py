@@ -37,6 +37,12 @@ def read(session, company, entity_class, id=None, **kwargs):
 
             return [a for a in entities if
                     _get_company(a, company) == company]
+        elif isinstance(id, tuple):
+            entity = session.query(entity_class).get(id)
+            
+            if _get_company(entity, company) == company:
+                return entity
+
         else:
             query = query.enable_assertions(False).filter(entity_class.id == id)
 
